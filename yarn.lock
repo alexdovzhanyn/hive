@@ -107,6 +107,11 @@
   resolved "https://registry.npmjs.org/@types/normalize-package-data/-/normalize-package-data-2.4.4.tgz"
   integrity sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==
 
+"@types/screeps@^3.3.8":
+  version "3.3.8"
+  resolved "https://registry.npmjs.org/@types/screeps/-/screeps-3.3.8.tgz"
+  integrity sha512-PlZRi5l0RaYNI67BgH4AUxhPeK9fKOyPNdFOVYiT66Olj1RtTjEaPY/REUNTSFKREczKM4oeLuVebJh6uorxzw==
+
 "@typescript-eslint/eslint-plugin@^4.0.1":
   version "4.33.0"
   resolved "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-4.33.0.tgz"

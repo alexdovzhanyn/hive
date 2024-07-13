@@ -1,1 +1,2 @@
-export * from './lib/number';
+import loop from './lib/gameLoop';
+export default loop;
