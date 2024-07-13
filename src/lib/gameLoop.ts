@@ -4,34 +4,26 @@ import roleDefender from './role.defender'
 import roleBuilder from './role.builder'
 import autoSpawnCreeps from './auto.spawnCreeps'
 
-const loop = function () {
-    var harvesters = []
-    var upgraders = []
-    var defenders = []
-    var builders = []
-    
-    for(var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        if (creep.memory.role == "harvester") {
-            roleHarvester.run(creep);
-            harvesters.push(creep);
-        }
-        if (creep.memory.role == "upgrader") {
-            roleUpgrader.run(creep);
-            upgraders.push(creep);
-        }
-        if (creep.memory.role == "defender") {
-            roleDefender.run(creep);
-            defenders.push(creep);
-        }
-        if (creep.memory.role == "builder") {
-            roleBuilder.run(creep);
-            builders.push(creep);
-        }
+export default () => {
+    console.log("This script is running")
+    const creepsByRole = {
+      harvester: [],
+      upgrader: [],
+      defender: [],
+      builder: []
     }
-    
-    autoSpawnCreeps.spawn(harvesters, builders, upgraders, defenders);
-    
-}
 
-export default loop
+    const creepRoleJobExecutionFunctions = {
+      harvester: roleHarvester,
+      upgrader: roleUpgrader,
+      defender: roleDefender,
+      builder: roleBuilder
+    }
+
+    Object.values(Game.creeps).forEach(creep => {
+      creepsByRole[creep.memory.role].push(creep)
+      creepRoleJobExecutionFunctions[creep.memory.role]()
+    })
+    
+    // autoSpawnCreeps.spawn(harvesters, builders, upgraders, defenders)
+}
