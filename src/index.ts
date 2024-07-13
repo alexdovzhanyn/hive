@@ -1,3 +1,5 @@
-import loop from './lib/gameLoop'
+import gameLoop from './lib/gameLoop'
 
-export default loop
+export default {
+  loop: gameLoop
+}

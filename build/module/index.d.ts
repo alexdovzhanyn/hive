@@ -1,2 +1,4 @@
-import loop from './lib/gameLoop';
-export default loop;
+declare const _default: {
+    loop: () => void;
+};
+export default _default;
