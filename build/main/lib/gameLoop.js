@@ -7,32 +7,25 @@ const role_harvester_1 = __importDefault(require("./role.harvester"));
 const role_upgrader_1 = __importDefault(require("./role.upgrader"));
 const role_defender_1 = __importDefault(require("./role.defender"));
 const role_builder_1 = __importDefault(require("./role.builder"));
-const auto_spawnCreeps_1 = __importDefault(require("./auto.spawnCreeps"));
-const loop = function () {
-    var harvesters = [];
-    var upgraders = [];
-    var defenders = [];
-    var builders = [];
-    for (var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        if (creep.memory.role == "harvester") {
-            role_harvester_1.default.run(creep);
-            harvesters.push(creep);
-        }
-        if (creep.memory.role == "upgrader") {
-            role_upgrader_1.default.run(creep);
-            upgraders.push(creep);
-        }
-        if (creep.memory.role == "defender") {
-            role_defender_1.default.run(creep);
-            defenders.push(creep);
-        }
-        if (creep.memory.role == "builder") {
-            role_builder_1.default.run(creep);
-            builders.push(creep);
-        }
-    }
-    auto_spawnCreeps_1.default.spawn(harvesters, builders, upgraders, defenders);
+// import autoSpawnCreeps from './auto.spawnCreeps'
+exports.default = () => {
+    console.log("This script is running");
+    const creepsByRole = {
+        harvester: [],
+        upgrader: [],
+        defender: [],
+        builder: []
+    };
+    const creepRoleJobExecutionFunctions = {
+        harvester: role_harvester_1.default,
+        upgrader: role_upgrader_1.default,
+        defender: role_defender_1.default,
+        builder: role_builder_1.default
+    };
+    Object.values(Game.creeps).forEach(creep => {
+        creepsByRole[creep.memory.role].push(creep);
+        creepRoleJobExecutionFunctions[creep.memory.role]();
+    });
+    // autoSpawnCreeps.spawn(harvesters, builders, upgraders, defenders)
 };
-exports.default = loop;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ2FtZUxvb3AuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvbGliL2dhbWVMb29wLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7O0FBQUEsc0VBQTRDO0FBQzVDLG9FQUEwQztBQUMxQyxvRUFBMEM7QUFDMUMsa0VBQXdDO0FBQ3hDLDBFQUFnRDtBQUVoRCxNQUFNLElBQUksR0FBRztJQUNULElBQUksVUFBVSxHQUFHLEVBQUUsQ0FBQTtJQUNuQixJQUFJLFNBQVMsR0FBRyxFQUFFLENBQUE7SUFDbEIsSUFBSSxTQUFTLEdBQUcsRUFBRSxDQUFBO0lBQ2xCLElBQUksUUFBUSxHQUFHLEVBQUUsQ0FBQTtJQUVqQixLQUFJLElBQUksSUFBSSxJQUFJLElBQUksQ0FBQyxNQUFNLEVBQUU7UUFDekIsSUFBSSxLQUFLLEdBQUcsSUFBSSxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQUMsQ0FBQztRQUM5QixJQUFJLEtBQUssQ0FBQyxNQUFNLENBQUMsSUFBSSxJQUFJLFdBQVcsRUFBRTtZQUNsQyx3QkFBYSxDQUFDLEdBQUcsQ0FBQyxLQUFLLENBQUMsQ0FBQztZQUN6QixVQUFVLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDO1NBQzFCO1FBQ0QsSUFBSSxLQUFLLENBQUMsTUFBTSxDQUFDLElBQUksSUFBSSxVQUFVLEVBQUU7WUFDakMsdUJBQVksQ0FBQyxHQUFHLENBQUMsS0FBSyxDQUFDLENBQUM7WUFDeEIsU0FBUyxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUMsQ0FBQztTQUN6QjtRQUNELElBQUksS0FBSyxDQUFDLE1BQU0sQ0FBQyxJQUFJLElBQUksVUFBVSxFQUFFO1lBQ2pDLHVCQUFZLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxDQUFDO1lBQ3hCLFNBQVMsQ0FBQyxJQUFJLENBQUMsS0FBSyxDQUFDLENBQUM7U0FDekI7UUFDRCxJQUFJLEtBQUssQ0FBQyxNQUFNLENBQUMsSUFBSSxJQUFJLFNBQVMsRUFBRTtZQUNoQyxzQkFBVyxDQUFDLEdBQUcsQ0FBQyxLQUFLLENBQUMsQ0FBQztZQUN2QixRQUFRLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDO1NBQ3hCO0tBQ0o7SUFFRCwwQkFBZSxDQUFDLEtBQUssQ0FBQyxVQUFVLEVBQUUsUUFBUSxFQUFFLFNBQVMsRUFBRSxTQUFTLENBQUMsQ0FBQztBQUV0RSxDQUFDLENBQUE7QUFFRCxrQkFBZSxJQUFJLENBQUEifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ2FtZUxvb3AuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvbGliL2dhbWVMb29wLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7O0FBQUEsc0VBQTRDO0FBQzVDLG9FQUEwQztBQUMxQyxvRUFBMEM7QUFDMUMsa0VBQXdDO0FBQ3hDLG1EQUFtRDtBQUVuRCxrQkFBZSxHQUFHLEVBQUU7SUFDaEIsT0FBTyxDQUFDLEdBQUcsQ0FBQyx3QkFBd0IsQ0FBQyxDQUFBO0lBQ3JDLE1BQU0sWUFBWSxHQUFHO1FBQ25CLFNBQVMsRUFBRSxFQUFFO1FBQ2IsUUFBUSxFQUFFLEVBQUU7UUFDWixRQUFRLEVBQUUsRUFBRTtRQUNaLE9BQU8sRUFBRSxFQUFFO0tBQ1osQ0FBQTtJQUVELE1BQU0sOEJBQThCLEdBQUc7UUFDckMsU0FBUyxFQUFFLHdCQUFhO1FBQ3hCLFFBQVEsRUFBRSx1QkFBWTtRQUN0QixRQUFRLEVBQUUsdUJBQVk7UUFDdEIsT0FBTyxFQUFFLHNCQUFXO0tBQ3JCLENBQUE7SUFFRCxNQUFNLENBQUMsTUFBTSxDQUFDLElBQUksQ0FBQyxNQUFNLENBQUMsQ0FBQyxPQUFPLENBQUMsS0FBSyxDQUFDLEVBQUU7UUFDekMsWUFBWSxDQUFDLEtBQUssQ0FBQyxNQUFNLENBQUMsSUFBSSxDQUFDLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFBO1FBQzNDLDhCQUE4QixDQUFDLEtBQUssQ0FBQyxNQUFNLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FBQTtJQUNyRCxDQUFDLENBQUMsQ0FBQTtJQUVGLG9FQUFvRTtBQUN4RSxDQUFDLENBQUEifQ==
