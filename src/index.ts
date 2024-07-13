@@ -1,5 +1,6 @@
 import gameLoop from './lib/gameLoop'
 
-export default {
-  loop: gameLoop
+export const loop = () => {
+  console.log('meow')
+  gameLoop()
 }
