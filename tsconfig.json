@@ -25,7 +25,11 @@
 
     "lib": ["es2017", "dom"],
     "types": ["screeps"],
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "typeRoots": ["node_modules/@types", "src/types"],
+    "baseUrl": "./src",
+    "paths": {
+      "@hive/*": ["*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**"],

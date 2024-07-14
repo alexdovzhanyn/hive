@@ -1,18 +1,18 @@
-import roleHarvester from './role.harvester'
-import roleUpgrader from './role.upgrader'
-import roleDefender from './role.defender'
-import roleBuilder from './role.builder'
-// import autoSpawnCreeps from './auto.spawnCreeps'
+import roleHarvester from './roles/role.harvester'
+import roleUpgrader from './roles/role.upgrader'
+import roleDefender from './roles/role.defender'
+import roleBuilder from './roles/role.builder'
+import spawner from './spawner'
+import { Role } from '@hive/types/roles'
 
 export default () => {
-    console.log("This script is running")
     const creepsByRole = {
-      harvester: [],
-      upgrader: [],
-      defender: [],
-      builder: []
+      [Role.Harvester]: [],
+      [Role.Upgrader]: [],
+      [Role.Defender]: [],
+      [Role.Builder]: []
     }
-
+    
     const creepRoleJobExecutionFunctions = {
       harvester: roleHarvester,
       upgrader: roleUpgrader,
@@ -22,8 +22,8 @@ export default () => {
 
     Object.values(Game.creeps).forEach(creep => {
       creepsByRole[creep.memory.role].push(creep)
-      creepRoleJobExecutionFunctions[creep.memory.role]()
+      creepRoleJobExecutionFunctions[creep.memory.role].run(creep)
     })
     
-    // autoSpawnCreeps.spawn(harvesters, builders, upgraders, defenders)
+    spawner.spawn(creepsByRole)
 }
