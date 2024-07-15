@@ -16,8 +16,8 @@ export const repairNearbyStructures = (creep: Creep) => {
   if (nearestStructureNeedingRepair) {
     creep.say('Repairing')
 
-    if (creep.repair(nearestStructureNeedingRepair[0]) == ERR_NOT_IN_RANGE) {
-      creep.moveTo(nearestStructureNeedingRepair[0], { maxRooms: 1 })
+    if (creep.repair(nearestStructureNeedingRepair) == ERR_NOT_IN_RANGE) {
+      creep.moveTo(nearestStructureNeedingRepair, { maxRooms: 1 })
     }
   }
 }
