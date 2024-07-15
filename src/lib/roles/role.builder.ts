@@ -1,7 +1,14 @@
 import { Role, UnitSpawnBlueprint } from '@hive/types/roles'
-import { harvestNearestSource, repairNearbyStructures } from '@hive/lib/jobs'
+import {
+  harvestNearestSource,
+  repairNearbyStructures,
+  depositInNearestEnergyContainer,
+  buildClosestContructionSite,
+  repairWalls
+} from '@hive/lib/jobs'
+import { SpawnStrategy } from '@hive/types/spawn'
 
-export const spawnBluePrint: UnitSpawnBlueprint = {
+const defaultBlueprint: UnitSpawnBlueprint = {
   bodyParts: [WORK, CARRY, CARRY, MOVE, MOVE],
   name: 'Builder',
   defaultMemory: {
@@ -9,30 +16,41 @@ export const spawnBluePrint: UnitSpawnBlueprint = {
   }
 }
 
+export const getBlueprintForSpawnStrategy = (strat: SpawnStrategy) => {
+  const blueprintToStrategy = {
+    [SpawnStrategy.Tier1]: defaultBlueprint,
+    [SpawnStrategy.Tier2]: {
+      ...defaultBlueprint,
+      bodyParts: [ ...defaultBlueprint.bodyParts, WORK, MOVE ]
+    }
+  }
+
+  return blueprintToStrategy[strat]
+}
+
 export default {
-    /** @param {Creep} creep **/
-    run: function(creep) {
+  /** @param {Creep} creep **/
+  run: function(creep) {
+    if(creep.memory.building && creep.carry.energy == 0) {
+      creep.memory.building = false
+    }
 
-	    if(creep.memory.building && creep.carry.energy == 0) {
-            creep.memory.building = false;
-            creep.say('harvesting');
-	    }
-	    if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
-	        creep.memory.building = true;
-	        creep.say('building');
-	    }
+    if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
+      creep.memory.building = true
+    }
 
-	    if(creep.memory.building) {
-            repairNearbyStructures(creep)
-            
-	        var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(targets.length) {
-                if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
-                }
-            }
-	    } else {
-	        harvestNearestSource(creep)
-	    }
+    if(creep.memory.building) {
+      repairNearbyStructures(creep)
+        
+      buildClosestContructionSite(creep)
+
+      repairWalls(creep)
+    } else {
+      harvestNearestSource(creep)
+
+      if (creep.carry.energy == creep.carryCapacity) {
+        depositInNearestEnergyContainer(creep)
+      }
+    }
 	}
 };

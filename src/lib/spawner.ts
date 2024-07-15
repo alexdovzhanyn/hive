@@ -1,14 +1,15 @@
-import { spawnBluePrint as harvesterBlueprint } from './roles/role.harvester'
-import { spawnBluePrint as builderBlueprint } from './roles/role.builder'
-import { spawnBluePrint as defenderBlueprint } from './roles/role.defender'
-import { spawnBluePrint as upgraderBlueprint } from './roles/role.upgrader'
+import { getBlueprintForSpawnStrategy as getHarvesterBlueprint } from './roles/role.harvester'
+import { getBlueprintForSpawnStrategy as getBuilderBlueprint } from './roles/role.builder'
+import { getBlueprintForSpawnStrategy as getDefenderBlueprint } from './roles/role.defender'
+import { getBlueprintForSpawnStrategy as getUpgraderBlueprint } from './roles/role.upgrader'
 import { Role } from '@hive/types/roles'
+import { SpawnStrategy } from '@hive/types/spawn'
 
 const roleToBlueprint = {
-  [Role.Harvester]: harvesterBlueprint,
-  [Role.Builder]: builderBlueprint,
-  [Role.Defender]: defenderBlueprint,
-  [Role.Upgrader]: upgraderBlueprint
+  [Role.Harvester]: getHarvesterBlueprint,
+  [Role.Builder]: getBuilderBlueprint,
+  [Role.Defender]: getDefenderBlueprint,
+  [Role.Upgrader]: getUpgraderBlueprint
 }
 
 const ROLE_SPAWN_PRIORITY = [
@@ -18,6 +19,36 @@ const ROLE_SPAWN_PRIORITY = [
   Role.Defender
 ]
 
+const attemptSpawnCreep = (role: Role, spawnStrategy: SpawnStrategy) => {
+  const { bodyParts, name, defaultMemory } = roleToBlueprint[role](spawnStrategy)
+
+  const energyStructures = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
+    filter: { structureType: STRUCTURE_EXTENSION }
+  }) as (StructureSpawn | StructureExtension)[]
+
+  energyStructures.push(Game.spawns.Spawn1)
+
+  const opts = { memory: defaultMemory, energyStructures }
+
+  const dryRun = Game.spawns.Spawn1.spawnCreep(
+    bodyParts,
+    name + Math.floor(Math.random() * 100),
+    { ...opts, dryRun: true }
+  )
+
+  if (dryRun != OK) return
+
+  const spawnAttempt = Game.spawns.Spawn1.spawnCreep(
+    bodyParts,
+    name + Math.floor(Math.random() * 100),
+    opts
+  )
+
+  if (spawnAttempt != OK) {
+    console.log(`Couldn't spawn creep: ${spawnAttempt}`)
+  }
+}
+
 const basicSpawnStrategy = (existingCreepsByRole) => {
   const CREEP_POPULATION_REQUIREMENTS = {
     harvester: 3,
@@ -25,37 +56,52 @@ const basicSpawnStrategy = (existingCreepsByRole) => {
     defender: 2,
     upgrader: 2
   }
-  
+
+  let allPopulationRequirementsSatisfied = true
+
   for (const role of ROLE_SPAWN_PRIORITY) {
     if (existingCreepsByRole[role].length < CREEP_POPULATION_REQUIREMENTS[role]) {
-      const { bodyParts, name, defaultMemory } = roleToBlueprint[role]
-      const unitSpawnCost = bodyParts.reduce((acc, part) => acc + BODYPART_COST[part], 0)
+      allPopulationRequirementsSatisfied = false
 
-      if (Game.spawns.Spawn1.store[RESOURCE_ENERGY] < unitSpawnCost) return
+      //console.log(`Total ${role}s: ${existingCreepsByRole[role].length}, need ${CREEP_POPULATION_REQUIREMENTS[role]}. Attemptying to spawn new ${role}...`)
 
-      console.log(`Total ${role}s: ${existingCreepsByRole[role].length}, need ${CREEP_POPULATION_REQUIREMENTS[role]}. Spawning new ${role}...`)
-    
-      const res = Game.spawns.Spawn1.spawnCreep(
-        bodyParts,
-        name + Math.floor(Math.random() * 100),
-        {
-          memory: defaultMemory
-        }
-      )
-
-      console.log(res)
-
-      return
+      return attemptSpawnCreep(role, SpawnStrategy.Tier1)
     }
+  }
+
+  if (allPopulationRequirementsSatisfied) {
+    attemptSpawnCreep(Role.Builder, SpawnStrategy.Tier1)
   }
 }
 
-const spawnStrategy2 = (existingCreepsByRole) => {
-  
+const spawnStrategyTier2 = (existingCreepsByRole) => {
+  const CREEP_POPULATION_REQUIREMENTS = {
+    harvester: 5,
+    builder: 3,
+    defender: 3,
+    upgrader: 3
+  }
+
+  let allPopulationRequirementsSatisfied = true
+
+  for (const role of ROLE_SPAWN_PRIORITY) {
+    if (existingCreepsByRole[role].length < CREEP_POPULATION_REQUIREMENTS[role]) {
+      allPopulationRequirementsSatisfied = false
+
+      //console.log(`Total ${role}s: ${existingCreepsByRole[role].length}, need ${CREEP_POPULATION_REQUIREMENTS[role]}. Attemptying to spawn new ${role}...`)
+
+      return attemptSpawnCreep(role, SpawnStrategy.Tier2)
+    }
+  }
+
+  if (allPopulationRequirementsSatisfied) {
+    attemptSpawnCreep(Role.Builder, SpawnStrategy.Tier2)
+  }
 }
 
 const spawnStrategyByControllerLevel = {
-  2: spawnStrategy2
+  [SpawnStrategy.Tier1]: basicSpawnStrategy,
+  [SpawnStrategy.Tier2]: spawnStrategyTier2
 }
 
 export default {
@@ -64,16 +110,22 @@ export default {
 
     if (Object.keys(Game.creeps).length < 3) return basicSpawnStrategy(existingCreepsByRole)
 
-    let highestAvailableSpawnStrategy = spawnStrategyByControllerLevel[Game.spawns.Spawn1.room.controller.level]
+    let controllerLevel = Game.spawns.Spawn1.room.controller.level
+
+    let highestAvailableSpawnStrategy = spawnStrategyByControllerLevel[controllerLevel]
 
     // Tries to find the next lowest spawn strategy if we dont have one for the current controller level
     while (!highestAvailableSpawnStrategy) {
-      const controllerLevel = Game.spawns.Spawn1.room.controller.level - 1
+      controllerLevel--
+
       if (controllerLevel == 0) {
         highestAvailableSpawnStrategy = basicSpawnStrategy
+        break
       }
 
       highestAvailableSpawnStrategy = spawnStrategyByControllerLevel[controllerLevel]
     }
+
+    highestAvailableSpawnStrategy(existingCreepsByRole);
   }
 };

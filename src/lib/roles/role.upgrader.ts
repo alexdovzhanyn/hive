@@ -1,13 +1,26 @@
 import { Role, UnitSpawnBlueprint } from '@hive/types/roles'
-import { harvestNearestSource } from '../jobs';
+import { harvestNearestSource } from '../jobs'
+import { SpawnStrategy } from '@hive/types/spawn'
 
-export const spawnBluePrint: UnitSpawnBlueprint = {
-    bodyParts: [WORK, CARRY, CARRY, MOVE, MOVE],
-    name: 'Upgrader',
-    defaultMemory: {
-      role: Role.Upgrader
+const defaultBlueprint: UnitSpawnBlueprint = {
+  bodyParts: [WORK, CARRY, CARRY, MOVE, MOVE],
+  name: 'Upgrader',
+  defaultMemory: {
+    role: Role.Upgrader
+  }
+}
+
+export const getBlueprintForSpawnStrategy = (strat: SpawnStrategy) => {
+  const blueprintToStrategy = {
+    [SpawnStrategy.Tier1]: defaultBlueprint,
+    [SpawnStrategy.Tier2]: {
+      ...defaultBlueprint,
+      bodyParts: [ ...defaultBlueprint.bodyParts, WORK, MOVE ]
     }
   }
+
+  return blueprintToStrategy[strat]
+}
 
 export default {
   /** @param {Creep} creep **/
