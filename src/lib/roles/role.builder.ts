@@ -40,13 +40,13 @@ export default {
     }
 
     if(creep.memory.building) {
-      repairNearbyStructures(creep)
+      if (repairNearbyStructures(creep)) return
         
-      buildClosestContructionSite(creep)
+      if (buildClosestContructionSite(creep)) return
 
       repairWalls(creep)
     } else {
-      harvestNearestSource(creep)
+      if (harvestNearestSource(creep)) return
 
       if (creep.carry.energy == creep.carryCapacity) {
         depositInNearestEnergyContainer(creep)
