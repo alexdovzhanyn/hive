@@ -9,13 +9,13 @@ export const harvestNearestSource = (creep: Creep) => {
 }
 
 export const repairNearbyStructures = (creep: Creep) => {
-  creep.say('Repairing')
-
   const nearestStructureNeedingRepair = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
     filter: ({ hits, hitsMax }) => hits < hitsMax
   })
 
   if (nearestStructureNeedingRepair) {
+    creep.say('Repairing')
+
     if (creep.repair(nearestStructureNeedingRepair[0]) == ERR_NOT_IN_RANGE) {
       creep.moveTo(nearestStructureNeedingRepair[0], { maxRooms: 1 })
     }
@@ -23,8 +23,6 @@ export const repairNearbyStructures = (creep: Creep) => {
 }
 
 export const depositInNearestEnergyContainer = (creep: Creep) => {
-  creep.say('Depositing')
-
   const closestAvailableEnergyContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
     filter: (structure) => 
       (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN) &&
@@ -32,18 +30,22 @@ export const depositInNearestEnergyContainer = (creep: Creep) => {
   })
 
   if (closestAvailableEnergyContainer) {
+    creep.say('Depositing')
+
     if (creep.transfer(closestAvailableEnergyContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
         creep.moveTo(closestAvailableEnergyContainer);
     }
+  } else {
+    creep.say('No available container for deposit')
   }
 }
 
 export const buildClosestContructionSite = (creep: Creep) => {
-  creep.say('Building');
-
   const closestContructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES)
 
   if (closestContructionSite) {
+    creep.say('Building')
+
     if (creep.build(closestContructionSite) == ERR_NOT_IN_RANGE) {
       creep.moveTo(closestContructionSite);
     }
@@ -51,13 +53,13 @@ export const buildClosestContructionSite = (creep: Creep) => {
 }
 
 export const repairWalls = (creep: Creep) => {
-  creep.say('Repairing walls')
-
   const closestRepairableWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
     filter: ({ hits, hitsMax, structureType }) => structureType == STRUCTURE_WALL && hits < hitsMax
   })
 
   if (closestRepairableWall) {
+    creep.say('Repairing walls')
+
     if (creep.repair(closestRepairableWall[0]) == ERR_NOT_IN_RANGE) {
       creep.moveTo(closestRepairableWall[0], { maxRooms: 1 })
     }
