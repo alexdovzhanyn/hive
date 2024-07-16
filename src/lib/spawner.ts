@@ -2,6 +2,7 @@ import { getBlueprintForSpawnStrategy as getHarvesterBlueprint } from './roles/r
 import { getBlueprintForSpawnStrategy as getBuilderBlueprint } from './roles/role.builder'
 import { getBlueprintForSpawnStrategy as getDefenderBlueprint } from './roles/role.defender'
 import { getBlueprintForSpawnStrategy as getUpgraderBlueprint } from './roles/role.upgrader'
+import { getBlueprintForSpawnStrategy as getMissionaryBlueprint } from './roles/role.missionary'
 import { Role } from '@hive/types/roles'
 import { SpawnStrategy } from '@hive/types/spawn'
 
@@ -9,7 +10,8 @@ const roleToBlueprint = {
   [Role.Harvester]: getHarvesterBlueprint,
   [Role.Builder]: getBuilderBlueprint,
   [Role.Defender]: getDefenderBlueprint,
-  [Role.Upgrader]: getUpgraderBlueprint
+  [Role.Upgrader]: getUpgraderBlueprint,
+  [Role.Missionary]: getMissionaryBlueprint
 }
 
 const ROLE_SPAWN_PRIORITY = [
@@ -19,7 +21,7 @@ const ROLE_SPAWN_PRIORITY = [
   Role.Defender
 ]
 
-const attemptSpawnCreep = (role: Role, spawnStrategy: SpawnStrategy) => {
+export const attemptSpawnCreep = (role: Role, spawnStrategy: SpawnStrategy) => {
   const { bodyParts, name, defaultMemory } = roleToBlueprint[role](spawnStrategy)
 
   const energyStructures = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
@@ -106,7 +108,7 @@ const spawnStrategyByControllerLevel = {
 
 export default {
   spawn: (existingCreepsByRole: Record<Role, Creep[]>) => {
-    if (Game.spawns.Spawn1.spawning) return
+    if (!Memory.allowAutoSpawn || Game.spawns.Spawn1.spawning) return
 
     if (Object.keys(Game.creeps).length < 3) return basicSpawnStrategy(existingCreepsByRole)
 

@@ -2,7 +2,8 @@ export enum Role {
   Harvester = 'harvester',
   Builder = 'builder',
   Upgrader = 'upgrader',
-  Defender = 'defender'
+  Defender = 'defender',
+  Missionary = 'missionary'
 }
 
 export interface UnitSpawnBlueprint {

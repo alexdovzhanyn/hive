@@ -4,7 +4,9 @@ import {
   repairNearbyStructures,
   depositInNearestEnergyContainer,
   buildClosestContructionSite,
-  repairWalls
+  repairWalls,
+  getEnergyFromNearestEnergyContainer,
+  upgradeController
 } from '@hive/lib/jobs'
 import { SpawnStrategy } from '@hive/types/spawn'
 
@@ -21,7 +23,7 @@ export const getBlueprintForSpawnStrategy = (strat: SpawnStrategy) => {
     [SpawnStrategy.Tier1]: defaultBlueprint,
     [SpawnStrategy.Tier2]: {
       ...defaultBlueprint,
-      bodyParts: [ ...defaultBlueprint.bodyParts, WORK, MOVE ]
+      bodyParts: [...defaultBlueprint.bodyParts, WORK, MOVE]
     }
   }
 
@@ -31,26 +33,29 @@ export const getBlueprintForSpawnStrategy = (strat: SpawnStrategy) => {
 export default {
   /** @param {Creep} creep **/
   run: function(creep) {
-    if(creep.memory.building && creep.carry.energy == 0) {
+    if (creep.memory.building && creep.carry.energy == 0) {
       creep.memory.building = false
     }
 
-    if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
+    if (!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
       creep.memory.building = true
     }
 
-    if(creep.memory.building) {
+    if (creep.memory.building) {
       if (repairNearbyStructures(creep)) return
-        
+
       if (buildClosestContructionSite(creep)) return
 
       repairWalls(creep)
     } else {
+      if (getEnergyFromNearestEnergyContainer(creep)) return
       if (harvestNearestSource(creep)) return
 
       if (creep.carry.energy == creep.carryCapacity) {
-        depositInNearestEnergyContainer(creep)
+        if (depositInNearestEnergyContainer(creep)) return
+
+        upgradeController(creep)
       }
     }
-	}
+  }
 };

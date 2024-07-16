@@ -22,13 +22,13 @@ export const harvestNearestSource = (creep: Creep) => {
   announceJob(creep, 'Harvesting')
 
   const nearestSource = creep.pos.findClosestByPath(FIND_SOURCES);
-  
+
   if (creep.harvest(nearestSource) == ERR_NOT_IN_RANGE) {
     creep.moveTo(
-      nearestSource, 
+      nearestSource,
       {
         maxRooms: 1,
-        visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Harvesting } 
+        visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Harvesting }
       }
     )
   }
@@ -46,13 +46,13 @@ export const repairNearbyStructures = (creep: Creep) => {
   if (nearestStructureNeedingRepair) {
     announceJob(creep, 'Repairing')
     performingJob = true
-    
+
     if (creep.repair(nearestStructureNeedingRepair) == ERR_NOT_IN_RANGE) {
       creep.moveTo(
         nearestStructureNeedingRepair,
         {
           maxRooms: 1,
-          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Repairing } 
+          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Repairing }
         }
       )
     }
@@ -61,12 +61,18 @@ export const repairNearbyStructures = (creep: Creep) => {
   return performingJob
 }
 
+export const upgradeController = (creep: Creep) => {
+  if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+    creep.moveTo(creep.room.controller)
+  }
+}
+
 export const depositInNearestEnergyContainer = (creep: Creep) => {
   let performingJob = false
 
   const closestAvailableEnergyContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: (structure) => 
-      (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN) &&
+    filter: (structure) => [STRUCTURE_EXTENSION, STRUCTURE_SPAWN, STRUCTURE_CONTAINER, STRUCTURE_TOWER].includes(structure.structureType as any) &&
+      // @ts-ignore
       structure.energy < structure.energyCapacity
   })
 
@@ -79,12 +85,38 @@ export const depositInNearestEnergyContainer = (creep: Creep) => {
         closestAvailableEnergyContainer,
         {
           maxRooms: 1,
-          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Depositing } 
+          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Depositing }
         }
       )
     }
   } else {
     creep.say('No available container for deposit')
+  }
+
+  return performingJob
+}
+
+export const getEnergyFromNearestEnergyContainer = (creep: Creep) => {
+  let performingJob = false
+
+  // Energy should only be retrieved from containers, not towers or spawn
+  const closestAvailableEnergyContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    // @ts-ignore
+    filter: ({ structureType, energy = 0 }) => structureType == STRUCTURE_CONTAINER && energy > 0
+  })
+
+  if (closestAvailableEnergyContainer) {
+    announceJob(creep, 'Get Energy')
+    performingJob = true
+
+    if (creep.withdraw(closestAvailableEnergyContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(
+        closestAvailableEnergyContainer,
+        {
+          maxRooms: 1
+        }
+      )
+    }
   }
 
   return performingJob
@@ -103,7 +135,7 @@ export const buildClosestContructionSite = (creep: Creep) => {
         closestContructionSite,
         {
           maxRooms: 1,
-          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Building } 
+          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Building }
         }
       )
     }
@@ -115,7 +147,8 @@ export const buildClosestContructionSite = (creep: Creep) => {
 export const repairWalls = (creep: Creep) => {
   let performingJob = false
   const closestRepairableWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: ({ hits, hitsMax, structureType }) => structureType == STRUCTURE_WALL && hits < hitsMax
+    // @ts-ignore
+    filter: ({ hits, hitsMax, structureType }) => structureType == STRUCTURE_WALL && hits < 10000
   })
 
   if (closestRepairableWall) {
@@ -124,10 +157,10 @@ export const repairWalls = (creep: Creep) => {
 
     if (creep.repair(closestRepairableWall) == ERR_NOT_IN_RANGE) {
       creep.moveTo(
-        closestRepairableWall, 
+        closestRepairableWall,
         {
           maxRooms: 1,
-          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Repairing } 
+          visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Repairing }
         }
       )
     }
@@ -146,9 +179,38 @@ export const attackHostileCreeps = (creep: Creep) => {
       nearestEnemy,
       {
         maxRooms: 1,
-        visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Attacking } 
+        visualizePathStyle: { ...PATH_STYLES, stroke: JobColor.Attacking }
       }
     )
+  }
+
+  return performingJob
+}
+
+export const captureFlaggedRoom = (creep: Creep) => {
+  let performingJob = false
+
+  const captureFlag = Game.flags.CaptureRoom
+
+  if (captureFlag && creep.carry.energy == creep.carryCapacity) {
+    performingJob = true
+    creep.moveTo(captureFlag)
+
+    if (creep.pos == captureFlag.pos) {
+      captureFlag.remove()
+      creep.memory.captureRoom = creep.room.name
+    }
+  }
+
+  if (creep.memory.captureRoom) {
+    performingJob = true
+    const roomController = Game.rooms[creep.memory.captureRoom].controller
+
+    if (creep.claimController(roomController) == ERR_NOT_IN_RANGE) {
+      creep.moveTo(roomController)
+    } else {
+      creep.memory.captureRoom = ''
+    }
   }
 
   return performingJob
