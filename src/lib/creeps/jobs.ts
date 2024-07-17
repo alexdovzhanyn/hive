@@ -42,7 +42,7 @@ export const repairNearbyStructures = (creep: Creep) => {
   let performingJob = false
 
   const nearestStructureNeedingRepair = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: ({ structureType, hits, hitsMax }) => structureType != STRUCTURE_WALL && hits < hitsMax
+    filter: ({ structureType, hits, hitsMax }) => structureType != STRUCTURE_WALL && hits < hitsMax && hits < 10000
   })
 
   if (nearestStructureNeedingRepair) {
