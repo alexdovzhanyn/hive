@@ -4,10 +4,8 @@ import {
   repairNearbyStructures,
   depositInNearestEnergyContainer,
   buildClosestContructionSite,
-  repairWalls,
-  getEnergyFromNearestEnergyContainer,
-  upgradeController
-} from '@hive/lib/jobs'
+  repairWalls
+} from '@hive/lib/creeps/jobs'
 import { SpawnStrategy } from '@hive/types/spawn'
 
 const defaultBlueprint: UnitSpawnBlueprint = {
@@ -48,13 +46,10 @@ export default {
 
       repairWalls(creep)
     } else {
-      if (getEnergyFromNearestEnergyContainer(creep)) return
       if (harvestNearestSource(creep)) return
 
       if (creep.carry.energy == creep.carryCapacity) {
-        if (depositInNearestEnergyContainer(creep)) return
-
-        upgradeController(creep)
+        depositInNearestEnergyContainer(creep)
       }
     }
   }

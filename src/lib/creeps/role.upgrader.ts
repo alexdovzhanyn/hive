@@ -1,5 +1,5 @@
 import { Role, UnitSpawnBlueprint } from '@hive/types/roles'
-import { harvestNearestSource, upgradeController } from '../jobs'
+import { harvestNearestSource, upgradeController } from '@hive/lib/creeps/jobs'
 import { SpawnStrategy } from '@hive/types/spawn'
 
 const defaultBlueprint: UnitSpawnBlueprint = {

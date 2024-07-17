@@ -1,3 +1,5 @@
+import { allies } from '@hive/config.json'
+
 const announceJob = (creep, job) => {
   if (creep.memory.lastAnnouncement != job) {
     creep.say(job)
@@ -39,8 +41,8 @@ export const harvestNearestSource = (creep: Creep) => {
 export const repairNearbyStructures = (creep: Creep) => {
   let performingJob = false
 
-  const nearestStructureNeedingRepair = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-    filter: ({ hits, hitsMax }) => hits < hitsMax
+  const nearestStructureNeedingRepair = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: ({ structureType, hits, hitsMax }) => structureType != STRUCTURE_WALL && hits < hitsMax
   })
 
   if (nearestStructureNeedingRepair) {
@@ -173,7 +175,10 @@ export const attackHostileCreeps = (creep: Creep) => {
   let performingJob = true
   announceJob(creep, "Attacking!")
 
-  const nearestEnemy = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+  const nearestEnemy = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS, {
+    filter: ({ owner }) => !allies.includes(owner.username)
+  });
+
   if (creep.attack(nearestEnemy) == ERR_NOT_IN_RANGE) {
     creep.moveTo(
       nearestEnemy,

@@ -1,5 +1,5 @@
 import { Role, UnitSpawnBlueprint } from '@hive/types/roles'
-import { depositInNearestEnergyContainer, harvestNearestSource } from '@hive/lib/jobs'
+import { depositInNearestEnergyContainer, harvestNearestSource } from '@hive/lib/creeps/jobs'
 import { SpawnStrategy } from '@hive/types/spawn'
 
 const defaultBlueprint: UnitSpawnBlueprint = {
@@ -15,7 +15,7 @@ export const getBlueprintForSpawnStrategy = (strat: SpawnStrategy) => {
     [SpawnStrategy.Tier1]: defaultBlueprint,
     [SpawnStrategy.Tier2]: {
       ...defaultBlueprint,
-      bodyParts: [ ...defaultBlueprint.bodyParts, WORK, MOVE ]
+      bodyParts: [...defaultBlueprint.bodyParts, WORK, MOVE]
     }
   }
 
@@ -25,7 +25,7 @@ export const getBlueprintForSpawnStrategy = (strat: SpawnStrategy) => {
 export default {
   /** @param {Creep} creep **/
   run: function(creep: Creep) {
-    if(creep.carry.energy < creep.carryCapacity) {
+    if (creep.carry.energy < creep.carryCapacity) {
       harvestNearestSource(creep)
     } else {
       depositInNearestEnergyContainer(creep)

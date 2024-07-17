@@ -1,8 +1,9 @@
-import { getBlueprintForSpawnStrategy as getHarvesterBlueprint } from './roles/role.harvester'
-import { getBlueprintForSpawnStrategy as getBuilderBlueprint } from './roles/role.builder'
-import { getBlueprintForSpawnStrategy as getDefenderBlueprint } from './roles/role.defender'
-import { getBlueprintForSpawnStrategy as getUpgraderBlueprint } from './roles/role.upgrader'
-import { getBlueprintForSpawnStrategy as getMissionaryBlueprint } from './roles/role.missionary'
+import { getBlueprintForSpawnStrategy as getHarvesterBlueprint } from './creeps/role.harvester'
+import { getBlueprintForSpawnStrategy as getBuilderBlueprint } from './creeps/role.builder'
+import { getBlueprintForSpawnStrategy as getDefenderBlueprint } from './creeps/role.defender'
+import { getBlueprintForSpawnStrategy as getUpgraderBlueprint } from './creeps/role.upgrader'
+import { getBlueprintForSpawnStrategy as getMissionaryBlueprint } from './creeps/role.missionary'
+import { creepNames } from '@hive/config.json'
 import { Role } from '@hive/types/roles'
 import { SpawnStrategy } from '@hive/types/spawn'
 
@@ -30,11 +31,13 @@ export const attemptSpawnCreep = (role: Role, spawnStrategy: SpawnStrategy) => {
 
   energyStructures.push(Game.spawns.Spawn1)
 
+
+  const creepName = creepNames[Math.floor(Math.random() * 100)] + ` (${name})`
   const opts = { memory: defaultMemory, energyStructures }
 
   const dryRun = Game.spawns.Spawn1.spawnCreep(
     bodyParts,
-    name + Math.floor(Math.random() * 100),
+    creepName,
     { ...opts, dryRun: true }
   )
 
@@ -42,7 +45,7 @@ export const attemptSpawnCreep = (role: Role, spawnStrategy: SpawnStrategy) => {
 
   const spawnAttempt = Game.spawns.Spawn1.spawnCreep(
     bodyParts,
-    name + Math.floor(Math.random() * 100),
+    creepName,
     opts
   )
 

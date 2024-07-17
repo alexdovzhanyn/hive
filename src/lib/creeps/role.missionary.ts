@@ -1,5 +1,5 @@
 import { Role, UnitSpawnBlueprint } from '@hive/types/roles'
-import { captureFlaggedRoom, harvestNearestSource } from '@hive/lib/jobs'
+import { captureFlaggedRoom, harvestNearestSource } from '@hive/lib/creeps/jobs'
 
 const defaultBlueprint: UnitSpawnBlueprint = {
   bodyParts: [MOVE, MOVE, MOVE, CLAIM, CARRY, CARRY, WORK],

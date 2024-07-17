@@ -1,10 +1,11 @@
-import roleHarvester from './roles/role.harvester'
-import roleUpgrader from './roles/role.upgrader'
-import roleDefender from './roles/role.defender'
-import roleBuilder from './roles/role.builder'
+import roleHarvester from './creeps/role.harvester'
+import roleUpgrader from './creeps/role.upgrader'
+import roleDefender from './creeps/role.defender'
+import roleBuilder from './creeps/role.builder'
+import roleMissionary from './creeps/role.missionary'
 import spawner, { attemptSpawnCreep } from './spawner'
 import { Role } from '@hive/types/roles'
-import roleMissionary from './roles/role.missionary'
+import { attackHostileCreeps } from './towers/jobs'
 
 export default () => {
   if (!global.spawnCreep) {
@@ -37,6 +38,14 @@ export default () => {
       delete Memory.creeps[i];
     }
   }
+
+  const towers = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
+    filter: ({ structureType }) => structureType == STRUCTURE_TOWER
+  })
+
+  towers.forEach(tower => {
+    attackHostileCreeps(tower as StructureTower)
+  })
 
   spawner.spawn(creepsByRole)
 }
