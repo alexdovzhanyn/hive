@@ -4,7 +4,8 @@ import {
   repairNearbyStructures,
   depositInNearestEnergyContainer,
   buildClosestContructionSite,
-  repairWalls
+  repairWalls,
+  upgradeController
 } from '@hive/lib/creeps/jobs'
 import { SpawnStrategy } from '@hive/types/spawn'
 
@@ -44,7 +45,11 @@ export default {
 
       if (buildClosestContructionSite(creep)) return
 
-      repairWalls(creep)
+      if (repairWalls(creep)) return
+
+      if (creep.carry.energy > 0) {
+        upgradeController(creep)
+      }
     } else {
       if (harvestNearestSource(creep)) return
 

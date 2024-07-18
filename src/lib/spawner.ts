@@ -22,6 +22,8 @@ const ROLE_SPAWN_PRIORITY = [
   Role.Defender
 ]
 
+const POPULATION_LIMIT = 25
+
 export const attemptSpawnCreep = (role: Role, spawnStrategy: SpawnStrategy) => {
   const { bodyParts, name, defaultMemory } = roleToBlueprint[role](spawnStrategy)
 
@@ -111,7 +113,7 @@ const spawnStrategyByControllerLevel = {
 
 export default {
   spawn: (existingCreepsByRole: Record<Role, Creep[]>) => {
-    if (!Memory.allowAutoSpawn || Game.spawns.Spawn1.spawning) return
+    if (!Memory.allowAutoSpawn || Game.spawns.Spawn1.spawning || Object.keys(Game.creeps).length >= POPULATION_LIMIT) return
 
     if (Object.keys(Game.creeps).length < 3) return basicSpawnStrategy(existingCreepsByRole)
 
